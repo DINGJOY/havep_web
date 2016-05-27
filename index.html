@@ -26,9 +26,10 @@
     </head>
 
     <body>
+            <h1 id='content'>Here data will come</h1>
 
 
-        <div class="fullscreen background" style="background-image:
+    <div class="fullscreen background" style="background-image:
             url('https://c2.staticflickr.com/8/7248/27275322225_f464479386_z.jpg');"
              data-img-width="1600" data-img-height="1064">
 
@@ -68,8 +69,26 @@
             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
             <script src="js/jquery.circliful.js"></script>
             <script>
+                var percentOfLift = 50;
 
-            var percentOfLift = 60;
+                function loadLiftData(){
+                    console.log("ajax was run");
+                    $.getJSON("test.json",
+                            function(data) {
+                                $('#content').html('THE DATA WAS: ' + data.ohshit + '<br/><br/>');
+                                percentOfLift = data.percent;
+                                console.log("data was updaed was run");
+                                $("#test-circle").circliful({
+                                    startDegree: percentOfLift,
+                                    percent: percentOfLift,
+
+                                });
+                            });
+                    setTimeout("loadLiftData()",200);
+                }
+
+                loadLiftData();
+
 
                 $( document ).ready(function() { // 6,32 5,38 2,34
                     $("#test-circle").circliful({
@@ -81,8 +100,8 @@
                         animationStep: 3,
                         foregroundBorderWidth: 12,
                         backgroundBorderWidth: 12,
-    //                    iconSize: '30',
-                        percent: percentOfLift,
+                        //                    iconSize: '30',
+                        percent: 0,
                         textSize: 20,
                         textStyle: 'font-size: 10px;',
                         textColor: '#39B54A',
