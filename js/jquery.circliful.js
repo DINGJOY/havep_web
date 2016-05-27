@@ -9,19 +9,20 @@
             //startDegree: 0,
             foregroundColor: "#3498DB",
             backgroundColor: "orange",
+            backColor: "orange",
             pointColor: "none",
             fillColor: 'none',
-            foregroundBorderWidth: 15,
+            foregroundBorderWidth: 0,
             backgroundBorderWidth: 15,
-            pointSize: 28.5,
-            fontColor: '#aaa',
+            pointSize: 50,
+            fontColor: '#39B54A',
             percent: 10,
             animation: 1,
-            animationStep: 5,
-            icon: 'f08a',
-            iconSize: '20',
-            iconColor: 'red',
-            iconPosition: 'bottom',
+            animationStep: 20,
+            icon: 'none',
+            // iconSize: '20',
+            // iconColor: 'red',
+            // iconPosition: 'bottom',
             target: 0,
             start: 0,
             showPercent: 1,
@@ -32,7 +33,7 @@
             targetColor: '#2980B9',
             text: null,
             textStyle: null,
-            textColor: '#666',
+            textColor: '#2980B9',
             multiPercentage: 0,
             percentages: null
         }, options);
@@ -42,8 +43,8 @@
             var percent = settings.percent;
             var iconY = 83;
             var iconX = 100;
-            var textY = 110;
-            var textX = 100;
+            var textY = 0;
+            var textX = 230;
             var additionalCss;
             var elements;
             var icon;
@@ -84,8 +85,8 @@
                 textY = 95;
                 elements = '<g stroke="' + (settings.backgroundColor != 'none' ? settings.backgroundColor : '#ccc') + '" ><line x1="75" y1="101" x2="125" y2="101" stroke-width="1"  /></g>';
                 elements += '<text text-anchor="middle" x="' + textX + '" y="120" style="font-size: ' + settings.targetTextSize + 'px;" fill="' + settings.targetColor + '">' + settings.targetPercent + '%</text>';
-                elements += '<circle cx="100" cy="100" r="69" fill="none" stroke="' + settings.backgroundColor + '" stroke-width="3" stroke-dasharray="450" transform="rotate(-90,100,100)" />';
-                elements += '<circle cx="100" cy="100" r="69" fill="none" stroke="' + settings.targetColor + '" stroke-width="3" stroke-dasharray="' + (360 / 100 * settings.targetPercent) + ', 20000" transform="rotate(-90,100,100)" />';
+                elements += '<circle cx="145" cy="128" r="57" fill="none" stroke="' + settings.backColor + '" stroke-width="10" stroke-dasharray="360" transform="rotate(-90,100,100)" />';
+                elements += '<circle cx="145" cy="128" r="" fill="none" stroke="' + settings.targetColor + '" stroke-width="3" stroke-dasharray="' + (360 / 100 * settings.targetPercent) + ', 20000" transform="rotate(-90,100,100)" />';
 
             }
 
@@ -104,9 +105,9 @@
                 .append(
                     $('<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 194 186" class="circliful">' +
                         elements +
-                        '<circle cx="100" cy="100" r="57" class="border" fill="' + settings.fillColor + '" stroke="' + settings.backgroundColor + '" stroke-width="' + backgroundBorderWidth + '" stroke-dasharray="360" transform="rotate(-90,100,100)" />' +
-                        '<circle class="circle" cx="100" cy="100" r="57" class="border" fill="none" stroke="' + settings.foregroundColor + '" stroke-width="' + settings.foregroundBorderWidth + '" stroke-dasharray="0,20000" transform="rotate(-90,100,100)" />' +
-                        '<circle cx="100" cy="100" r="' + settings.pointSize + '" fill="' + settings.pointColor + '" />' +
+                        '<circle cx="145" cy="128" r="57" class="border" fill="' + settings.fillColor + '" stroke="' + settings.backgroundColor + '" stroke-width="' + backgroundBorderWidth + '" stroke-dasharray="360" transform="rotate(-90,100,100)" />' +
+                        '<circle class="circle" cx="145" cy="128" r="57" class="border" fill="none" stroke="' + settings.foregroundColor + '" stroke-width="' + settings.foregroundBorderWidth + '" stroke-dasharray="0,20000" transform="rotate(-90,100,100)" />' +
+                        '<circle cx="145" cy="128" r="' + settings.pointSize + '" fill="' + settings.pointColor + '" />' +
                         icon +
                         '<text class="timer" text-anchor="middle" x="' + textX + '" y="' + textY + '" style="font-size: ' + settings.percentageTextSize + 'px; ' + additionalCss + ';' + settings.textAdditionalCss + '" fill="' + settings.fontColor + '">0%</text>')
                 );
@@ -169,5 +170,55 @@
             }
         });
     }
+    /* fix vertical when not overflow
+     call fullscreenFix() if .fullscreen content changes */
+    function fullscreenFix(){
+        var h = $('body').height();
+        // set .fullscreen height
+        $(".content-b").each(function(i){
+            if($(this).innerHeight() > h){ $(this).closest(".fullscreen").addClass("overflow");
+            }
+        });
+    }
+    $(window).resize(fullscreenFix);
+    fullscreenFix();
+
+    /* resize background images */
+    function backgroundResize(){
+        var windowH = $(window).height();
+        $(".background").each(function(i){
+            var path = $(this);
+            // variables
+            var contW = path.width();
+            var contH = path.height();
+            var imgW = path.attr("data-img-width");
+            var imgH = path.attr("data-img-height");
+            var ratio = imgW / imgH;
+            // overflowing difference
+            var diff = parseFloat(path.attr("data-diff"));
+            diff = diff ? diff : 0;
+            // remaining height to have fullscreen image only on parallax
+            var remainingH = 0;
+            if(path.hasClass("parallax")){
+                var maxH = contH > windowH ? contH : windowH;
+                remainingH = windowH - contH;
+            }
+            // set img values depending on cont
+            imgH = contH + remainingH + diff;
+            imgW = imgH * ratio;
+            // fix when too large
+            if(contW > imgW){
+                imgW = contW;
+                imgH = imgW / ratio;
+            }
+            //
+            path.data("resized-imgW", imgW);
+            path.data("resized-imgH", imgH);
+            path.css("background-size", imgW + "px " + imgH + "px");
+        });
+    }
+    $(window).resize(backgroundResize);
+    $(window).focus(backgroundResize);
+    backgroundResize();
 
 }(jQuery));
